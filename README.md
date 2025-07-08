@@ -15,7 +15,7 @@ fast_tlnd/
     ├── network_design.py             # Network design code
     ├── outlier_exclusion.py          # The optional outlier exclusion
     └── write_outputs.py              # Write the output files
-└── requirements.txt 
+└── requirements.txt
 ```
 
 ## Dependencies
@@ -43,11 +43,11 @@ pip install -r requirements.txt
 
 4. **Outputs:**
    - The generated output files are saved in the results/<project_name>/ directory, including shapefiles and summary metrics.
-  
 
 
 
-# Model Computation Overview 
+
+# Model Computation Overview
 
 ## Merging and Clustering
 
@@ -85,3 +85,25 @@ The figure below compares the LV network layouts produced by TLND and Accel-TLND
   <img src="./appendix/comparison_BUTALEJA_51_4panel.png" alt="Comparison of TLND and Accel-TLND LV Layouts" width="600"/>
 </p>
 
+
+## Outlier Exclusion Function
+
+Functions in `scripts/outlier_exclusion.py` use DBSCAN clustering to automatically identify and remove geospatial outliers that can distort community distribution metrics. When `outlier_exclusion_case` is True in the params.yaml, it runs as a preprocessing step before network design to ensure robust cost calculations.
+
+**Usage:**
+```python
+filtered_nodes = exclude_outliers(nodes_gdf, eps=100, min_samples=5)
+```
+
+**Parameters:**
+- `nodes_gdf`: GeoDataFrame containing node geographic information
+- `eps`: Distance threshold in meters (default: 100)
+- `min_samples`: Minimum nodes to form a cluster (default: 5)
+
+The function leverages sklearn's DBSCAN implementation and can be used independently from the main model for outlier detection in geospatial datasets.
+
+
+## Structure Merging Function
+
+This is a preprocessing step. Open-source building footprint data, developed from satellite imagery, reflects predicted building structures. In rural areas, it’s common for a single household to have multiple nearby structures. According to Uganda’s 2024 census, there are 10.7 million households, while Google’s Open Buildings data detects 18.4 million structures. In urban areas, merging may not be necessary due to multi-family housing, but in rural regions, it helps approximate household locations for further analysis. And in our study,
+See details about the process here: [Strutcure Merge Preparation](scripts/preparation/README_str_merge.md)
