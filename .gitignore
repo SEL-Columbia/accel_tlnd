@@ -36,3 +36,6 @@ share/python-wheels/
 MANIFEST
 results/*
 !results/.gitkeep
+
+# Archived files/folders
+archived/

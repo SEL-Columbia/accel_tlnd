@@ -1,0 +1,14 @@
+costs_params:
+  lv_cost_per_meter: 8.0
+  mv_cost_per_meter: 20.0
+  transformer_cost: 2500.0
+eps_meters: 100
+epsg: 32636
+max_dist: 1000
+milp_params:
+  time_limit: 60
+min_samples: 3
+model_selection: mst
+my_shp: accel_tlnd_model/inputs/example_3_parish_42320601_merged_structures.parquet
+outlier_exclusion_case: true
+project_name: example_project_3

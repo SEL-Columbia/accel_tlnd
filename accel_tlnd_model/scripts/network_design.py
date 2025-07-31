@@ -17,8 +17,10 @@ import geopandas as gpd
 from scipy.spatial import distance_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 from shapely.geometry import LineString, Point
-from gurobipy import Model, GRB, quicksum
 from tqdm import tqdm
+# To use the Gurobi-based MILP option, you need a valid Gurobi license.
+# Uncomment the import line below and ensure gurobipy is installed if you wish to enable this feature.
+# from gurobipy import Model, GRB, quicksum 
 
 
 # -------------------------------------------------

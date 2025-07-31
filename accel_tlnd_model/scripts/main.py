@@ -6,7 +6,7 @@ from write_outputs import output_processing, visualize_network
 
 # Define directory paths
 SCRIPT_DIR = pathlib.Path(__file__).parent
-PROJECT_DIR = SCRIPT_DIR.parent
+PROJECT_DIR = SCRIPT_DIR.parent.parent
 
 # Edit the scenario parameters and config in the yaml file
 def load_config(config_path):
@@ -40,7 +40,7 @@ def main(nodes_gdf, config):
     elapsed_time = time.time() - start_time  # End timer and calculate elapsed time
     print(f"Elapsed time: {elapsed_time:.2f} seconds")
 
-    results_dir = PROJECT_DIR / "results" / config["project_name"]
+    results_dir = PROJECT_DIR / "accel_tlnd_model" / "results" / config["project_name"]
     results_dir.mkdir(parents=True, exist_ok=True)
 
     output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf, excluded_nodes_gdf, 
@@ -53,7 +53,13 @@ if __name__ == "__main__":
     config = load_config(SCRIPT_DIR / "params.yaml")
 
     # any geospatial file format read by geopandas can be used
-    nodes_gdf = gpd.read_file(str(PROJECT_DIR / config["my_shp"]))
+    my_file_str = str(PROJECT_DIR / config["my_shp"])
+    if my_file_str.endswith('.shp') or my_file_str.endswith('.geojson'):
+        nodes_gdf = gpd.read_file(my_file_str)
+    elif my_file_str.endswith('.parquet'):
+        nodes_gdf = gpd.read_parquet(my_file_str)
+    else:
+        raise ValueError(f"Unsupported file format: {my_file_str}")
     nodes_gdf.set_crs(epsg=config["epsg"], inplace=True)
 
     # make sure the crs of the nodes_gdf is set to the correct one.
