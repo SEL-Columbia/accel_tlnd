@@ -5,7 +5,7 @@ import pathlib
 import argparse
 import time
 
-SCRIPT_DIR = pathlib.Path(__file__).parent
+PROJECT_DIR = pathlib.Path(__file__).parent.parent
 
 def process_merging_process(origin_points, merging_radius):
     # Add required columns
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     
     # Convert to Path objects
     input_file = pathlib.Path(args.input_file)
-    output_file = pathlib.Path(args.output_file)
+    output_file = PROJECT_DIR / "structure_merging_model" / "results" / args.output_file
     
     # Create output directory if it doesn't exist
     output_file.parent.mkdir(parents=True, exist_ok=True)

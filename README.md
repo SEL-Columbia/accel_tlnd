@@ -29,9 +29,10 @@ or for two-level network design process,
 
 ## Merging process notes
 - Input files: You can upload your local files into 'accel_tlnd/structure_merging_model/inputs', or use the provided sample files.
-- Next, specify the output path where you would like to save your results.
+- Next, specify the project name, it will be the folder to save the results.
 - Adjust the parameters as needed.
-- Click 'Run Merging' and wait for the process to complete. The results will be saved in the folder you specified.
+- Click 'Run Merging' and wait for the process to complete. 
+- The results will be saved in the `accel_tlnd/structure_merging_model/results/{project_name}` directory.
 
 
 ## Accelerated Two-Level Network Design Notes
@@ -39,7 +40,8 @@ or for two-level network design process,
 - Input files: Upload your local files to the `accel_tlnd/accel_tlnd_model/inputs` directory, or use the provided sample files.
 - Specify the desired output path for saving your results.
 - Adjust the analysis parameters as needed.
-- Click 'Run Analysis' and wait for the process to finish. The results will be saved in the folder you specified.
+- Click 'Run Analysis' and wait for the process to finish. 
+- The results will be saved in the `accel_tlnd/accel_tlnd_model/results/{project_name}` directory.
 
 
 ## Save results
