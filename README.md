@@ -7,7 +7,7 @@ Step 1 - open a new Colab notebook in your browser, https://colab.research.googl
 Step 2 - in the created file, clone the training-version branch, using the code below
 ```python
 !git clone --branch training-version https://github.com/SEL-Columbia/accel_tlnd.git
-%cd <repository_folder>
+%cd accel_tlnd
 ```
 
 Step 3 - install the dependencies
