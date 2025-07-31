@@ -1,58 +1,58 @@
 # Accelerated Two-Level Network Design Model (Training Version)
 
-## In the training version (Phase 1)
+## Process on Google Colab
 
-- There is **no parallel processing** in this phase.
-- The **merging process is moved out** and handled separately.
+Step 1 - open a new Colab notebook in your browser, https://colab.research.google.com/
 
-### Training on Google Colab
-
-To run the training version on Google Colab, follow these steps:
-
-1. **Open a new Colab notebook** in your browser.
-2. **Clone this GitHub repository** into your Colab environment:
-   ```python
-   !git clone <repository_url>
-   %cd <repository_folder>
-   ```
-3. **A - Run the UI notebook for TLND:**
-   - Open and run `network_design_ui.ipynb` to perform the two-level network design process.
-   - You can run it directly in Colab with:
-     ```python
-     %run network_design_ui.ipynb
-     ```
-4. **B - Run the UI notebook for merging:**
-   - open and run `merging_ui.ipynb` to perform or structure the merging process.
-   - Run it in Colab with:
-     ```python
-     %run merging_ui.ipynb
-     ```
-
-> **Note:**  
-> - Make sure to upload or place your input files in the appropriate directories as required by the notebooks.
-> - Adjust any parameters or file paths in the UI notebooks as needed for your specific case.
-
-This workflow separates the network design and merging steps, and is intended for interactive use in a Colab environment.
-
-
-## Outlier Exclusion Function
-
-Functions in `scripts/outlier_exclusion.py` use DBSCAN clustering to automatically identify and remove geospatial outliers that can distort community distribution metrics. When `outlier_exclusion_case` is True in the params.yaml, it runs as a preprocessing step before network design to ensure robust cost calculations.
-
-**Usage:**
+Step 2 - in the created file, clone the training-version branch, using the code below
 ```python
-filtered_nodes = exclude_outliers(nodes_gdf, eps=100, min_samples=5)
+!git clone --branch training-version https://github.com/SEL-Columbia/accel_tlnd.git
+%cd <repository_folder>
 ```
 
-**Parameters:**
-- `nodes_gdf`: GeoDataFrame containing node geographic information
-- `eps`: Distance threshold in meters (default: 100)
-- `min_samples`: Minimum nodes to form a cluster (default: 5)
+Step 3 - install the dependencies
+```python
+!pip install -r requirements.txt
+```
 
-The function leverages sklearn's DBSCAN implementation and can be used independently from the main model for outlier detection in geospatial datasets.
+Step 4 - Run the UI notebook:
+
+For structure the merging process, 
+```python
+%run merging_ui.ipynb
+```
+
+or for two-level network design process, 
+```python
+%run accel_tlnd_ui.ipynb
+```
+
+## Merging process notes
+- Input files: You can upload your local files into 'accel_tlnd/structure_merging_model/inputs', or use the provided sample files.
+- Next, specify the output path where you would like to save your results.
+- Adjust the parameters as needed.
+- Click 'Run Merging' and wait for the process to complete. The results will be saved in the folder you specified.
 
 
-## Structure Merging Function
+## Accelerated Two-Level Network Design Notes
 
-This is a preprocessing step. Open-source building footprint data, developed from satellite imagery, reflects predicted building structures. In rural areas, it’s common for a single household to have multiple nearby structures. According to Uganda’s 2024 census, there are 10.7 million households, while Google’s Open Buildings data detects 18.4 million structures. In urban areas, merging may not be necessary due to multi-family housing, but in rural regions, it helps approximate household locations for further analysis. And in our study,
-See details about the process here: [Strutcure Merge Preparation](scripts/preparation/README_str_merge.md)
+- Input files: Upload your local files to the `accel_tlnd/accel_tlnd_model/inputs` directory, or use the provided sample files.
+- Specify the desired output path for saving your results.
+- Adjust the analysis parameters as needed.
+- Click 'Run Analysis' and wait for the process to finish. The results will be saved in the folder you specified.
+
+
+## Save results
+Files uploaded to Google Colab are stored temporarily and will be deleted once the session ends. Be sure to save your files before closing your browser. 
+
+You can download folders or specific files using the left sidebar menu.  
+Alternatively, you can save your results directly to your Google Drive.
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+```
+
+```python
+!cp -r /content/accel_tlnd /content/drive/MyDrive/accel_tlnd_training_model
+```
