@@ -9,6 +9,6 @@ milp_params:
   time_limit: 60
 min_samples: 3
 model_selection: mst
-my_shp: accel_tlnd_model/inputs/example_3_parish_42320601_merged_structures.parquet
-outlier_exclusion_case: true
+my_shp: accel_tlnd_model/inputs/example_1/nodes_for_netdesign.shp
+outlier_exclusion_case: false
 project_name: example_project_3
