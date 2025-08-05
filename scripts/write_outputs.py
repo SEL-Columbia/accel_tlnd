@@ -15,7 +15,9 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
         'num_nodes': len(nodes_gdf),
         'num_transformers': len(transformer_gdf),
         'total_lv_length': sum(line.length for line in lv_gdf.geometry),
-        'total_mv_length': sum(line.length for line in mv_gdf.geometry)
+        'total_mv_length': sum(line.length for line in mv_gdf.geometry),
+        'total_str_no': sum(nodes_gdf['str_no']),
+        'total_AggArea_m2': sum(nodes_gdf['AggArea_m2'])
     }
 
     total_costs = network_metrics['num_transformers'] * costs_params['transformer_cost'] + \
@@ -33,6 +35,8 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
         'Number of Nodes in Network': network_metrics['num_nodes'],
         'Number of Nodes Excluded': len(excluded_nodes_gdf) if excluded_nodes_gdf is not None else 0,
         'Number of Transformers': network_metrics['num_transformers'],
+        'Number of Structures': network_metrics['total_str_no'],
+        'Total Structure Area (m2)': network_metrics['total_AggArea_m2'],
         'Total LV Length (m)': network_metrics['total_lv_length'],
         'Total MV Length (m)': network_metrics['total_mv_length'],
         'Total Costs ($)': total_costs,
@@ -46,6 +50,19 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
     with open(output_file, "w") as file:
         for name, value in output_metrics.items():
             file.write(f"{name}, {value:.2f}\n")
+    
+    # update the original structure count to transformer data
+    # Aggregate 'str_no' and 'AggArea_m2' for each transformer_id in nodes_gdf
+    agg_df = nodes_gdf.groupby('transformer_id').agg(
+        total_str_no=('str_no', 'sum'),
+        total_AggArea_m2=('AggArea_m2', 'sum')
+    ).reset_index()
+    # Merge these aggregated values into transformer_gdf based on transformer_id 
+    transformer_gdf = transformer_gdf.merge(
+        agg_df,
+        how='left',
+        on='transformer_id'
+    )
 
     nodes_gdf.to_file(results_dir / 'included_nodes.gpkg', driver='GPKG')
     if excluded_nodes_gdf is not None and len(excluded_nodes_gdf) > 0:
