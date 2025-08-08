@@ -71,7 +71,6 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
     lv_gdf.to_file(f'{results_dir}/lv_lines.gpkg', driver='GPKG')
     mv_gdf.to_file(f'{results_dir}/mv_lines.gpkg', driver='GPKG')
 
-    print('get transformer info')
     # initialize columns
     transformer_gdf['hh_count'] = float('nan')
     transformer_gdf['pue_count'] = float('nan')
