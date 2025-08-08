@@ -68,9 +68,44 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
     nodes_gdf.to_file(results_dir / 'included_nodes.gpkg', driver='GPKG')
     if excluded_nodes_gdf is not None and len(excluded_nodes_gdf) > 0:
         excluded_nodes_gdf.to_file(results_dir / 'excluded_nodes.gpkg', driver='GPKG')
-    transformer_gdf.to_file(f'{results_dir}/transformers.gpkg', driver='GPKG')
     lv_gdf.to_file(f'{results_dir}/lv_lines.gpkg', driver='GPKG')
     mv_gdf.to_file(f'{results_dir}/mv_lines.gpkg', driver='GPKG')
+
+    print('get transformer info')
+    # initialize columns
+    transformer_gdf['hh_count'] = float('nan')
+    transformer_gdf['pue_count'] = float('nan')
+    transformer_gdf['irrigation_count'] = float('nan')
+    transformer_gdf['small_shop_count'] = float('nan')
+    transformer_gdf['lv_total_m'] = float('nan')
+    transformer_gdf['lv_per_node_m'] = float('nan')
+    
+    # add info to transformer_gdf
+    if 'node_type' in nodes_gdf.columns:
+        # loop through each transformer
+        for idx, transformer in transformer_gdf.iterrows():
+            cluster_id = transformer['cluster_id']
+            # Count households and PUEs in this cluster
+            cluster_nodes = nodes_gdf[nodes_gdf['cluster'] == cluster_id]
+            transformer_gdf.at[idx, 'hh_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'hh'])
+            transformer_gdf.at[idx, 'pue_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'pue'])
+            transformer_gdf.at[idx, 'irrigation_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'irrigation'])
+            transformer_gdf.at[idx, 'small_shop_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'small_shop'])
+    
+    # If there is lv_gdf, 
+    # Calculate total LV line length for this cluster
+    if not lv_gdf.empty:
+        for idx, transformer in transformer_gdf.iterrows():
+            cluster_id = transformer['cluster_id']
+            cluster_lv = lv_gdf[lv_gdf['cluster_id'] == cluster_id]
+            # Explicitly convert to float to avoid dtype incompatibility warning
+            transformer_gdf.at[idx, 'lv_total_m'] = float(cluster_lv.length.sum())
+            # avg. LV length per node
+            cluster_nodes = nodes_gdf[nodes_gdf['cluster'] == cluster_id]
+            if len(cluster_nodes) > 0:
+                transformer_gdf.at[idx, 'lv_per_node_m'] = float(cluster_lv.length.sum() / len(cluster_nodes))
+
+    transformer_gdf.to_file(f'{results_dir}/transformers.gpkg', driver='GPKG')
 
     return None
 
