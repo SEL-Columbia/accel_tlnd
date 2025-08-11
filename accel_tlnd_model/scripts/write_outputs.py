@@ -72,25 +72,9 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
     mv_gdf.to_file(f'{results_dir}/mv_lines.gpkg', driver='GPKG')
 
     # initialize columns
-    transformer_gdf['hh_count'] = float('nan')
-    transformer_gdf['pue_count'] = float('nan')
-    transformer_gdf['irrigation_count'] = float('nan')
-    transformer_gdf['small_shop_count'] = float('nan')
     transformer_gdf['lv_total_m'] = float('nan')
     transformer_gdf['lv_per_node_m'] = float('nan')
-    
-    # add info to transformer_gdf
-    if 'node_type' in nodes_gdf.columns:
-        # loop through each transformer
-        for idx, transformer in transformer_gdf.iterrows():
-            cluster_id = transformer['cluster_id']
-            # Count households and PUEs in this cluster
-            cluster_nodes = nodes_gdf[nodes_gdf['cluster'] == cluster_id]
-            transformer_gdf.at[idx, 'hh_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'hh'])
-            transformer_gdf.at[idx, 'pue_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'pue'])
-            transformer_gdf.at[idx, 'irrigation_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'irrigation'])
-            transformer_gdf.at[idx, 'small_shop_count'] = len(cluster_nodes[cluster_nodes['node_type'] == 'small_shop'])
-    
+
     # If there is lv_gdf, 
     # Calculate total LV line length for this cluster
     if not lv_gdf.empty:
@@ -103,6 +87,27 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
             cluster_nodes = nodes_gdf[nodes_gdf['cluster'] == cluster_id]
             if len(cluster_nodes) > 0:
                 transformer_gdf.at[idx, 'lv_per_node_m'] = float(cluster_lv.length.sum() / len(cluster_nodes))
+
+    # add node type count to transformer_gdf
+    if 'node_type' in nodes_gdf.columns:
+        # add count columns for each unique node_type in nodes_gdf
+        node_types = nodes_gdf['node_type'].dropna().unique()
+        for nt in node_types:
+            col_name = f"{nt}_count"
+            if col_name not in transformer_gdf.columns:
+                transformer_gdf[col_name] = 0
+
+        # loop through each transformer
+        for idx, transformer in transformer_gdf.iterrows():
+
+            cluster_id = transformer['cluster_id']
+            # Count households and PUEs in this cluster
+            cluster_nodes = nodes_gdf[nodes_gdf['cluster'] == cluster_id]
+            # Count all unique node_types for this cluster and assign to transformer_gdf
+            node_type_counts = cluster_nodes['node_type'].value_counts()
+            for nt, count in node_type_counts.items():
+                col_name = f"{nt}_count"
+                transformer_gdf.at[idx, col_name] = count
 
     transformer_gdf.to_file(f'{results_dir}/transformers.gpkg', driver='GPKG')
 
