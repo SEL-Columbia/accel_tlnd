@@ -109,7 +109,15 @@ def output_processing(nodes_gdf, transformer_gdf, lv_gdf, mv_gdf,
                 col_name = f"{nt}_count"
                 transformer_gdf.at[idx, col_name] = count
 
+
+    # get the longitude and latitude of the transformers
+    # Convert transformer_gdf CRS to WGS84 (longitude/latitude) before extracting coordinates
+    transformer_gdf_wgs = transformer_gdf.to_crs(epsg=4326)
+    transformer_gdf['longitude'] = transformer_gdf_wgs['geometry'].x
+    transformer_gdf['latitude'] = transformer_gdf_wgs['geometry'].y
+    
     transformer_gdf.to_file(f'{results_dir}/transformers.gpkg', driver='GPKG')
+    transformer_gdf.to_csv(f'{results_dir}/transformers.csv', index=False)
 
     return None
 
