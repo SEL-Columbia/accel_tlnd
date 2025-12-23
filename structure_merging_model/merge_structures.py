@@ -124,6 +124,15 @@ if __name__ == "__main__":
     print(f"Processing time: {processing_time:.2f} seconds")
     
     # Save results based on output extension
+
+    # Ensure the GeoDataFrame is in WGS84 (EPSG:4326) before extracting coordinates
+    results_wgs = results.to_crs(epsg=4326)
+    results['longitude'] = results_wgs.geometry.x
+    results['latitude'] = results_wgs.geometry.y
+
+
     # Only allow saving as parquet file
     results.to_parquet(output_file, index=False, compression='snappy')
+    results.to_csv(output_file.with_suffix('.csv'), index=False)
+
     print(f"Results saved to: {output_file}")
