@@ -55,14 +55,14 @@ def process_merging_process(origin_points, merging_radius):
     mask = merged_buffer_sj.index.isin(merged_buffer_sj[merged_buffer_sj['structure_no_left'] == 1].index)
     merged_buffer_sj.loc[mask, 'aggr_area_m2'] = merged_buffer_sj.loc[mask, 'area_in_meters_left']
 
-    # Convert CRS to EPSG:32636
-    merged_buffer_sj = merged_buffer_sj.set_crs("EPSG:32636", allow_override=True)
-
     # Select and rename columns to match merge_structures output
     # If 'd_left' is not present, you may need to adjust this line accordingly
     cols_to_keep = ['d_left', 'geometry', 'origin_id_left', 'structure_no_left', 'aggr_area_m2']
     merged_buffer_sj = merged_buffer_sj[cols_to_keep]
     merged_buffer_sj.columns = ['district', 'geometry', 'origin_id', 'str_no', 'AggArea_m2']
+
+    # set crs to original input crs
+    merged_buffer_sj.set_crs(origin_points.crs, inplace=True)
 
     return merged_buffer_sj
 
