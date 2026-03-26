@@ -107,3 +107,61 @@ The function leverages sklearn's DBSCAN implementation and can be used independe
 
 This is a preprocessing step. Open-source building footprint data, developed from satellite imagery, reflects predicted building structures. In rural areas, it’s common for a single household to have multiple nearby structures. According to Uganda’s 2024 census, there are 10.7 million households, while Google’s Open Buildings data detects 18.4 million structures. In urban areas, merging may not be necessary due to multi-family housing, but in rural regions, it helps approximate household locations for further analysis. And in our study,
 See details about the process here: [Strutcure Merge Preparation](scripts/preparation/README_str_merge.md)
+
+
+
+## MILP-based LV Network Design Formulation 
+
+This formulation provides an alternative LV network design within each transformer cluster, enforcing a maximum path distance from the transformer to all connected nodes.
+
+#### Sets
+- $N$: set of nodes in a cluster
+- Node $0$ is the transformer (root), others are customer nodes
+
+#### Parameters
+- $c_{ij}$: Euclidean distance between node $i$ and $j$
+- $D^{\max}$: maximum allowed path distance from transformer to any node
+- $M$: a sufficiently large constant
+
+#### Decision Variables
+- $x_{ij} \in \{0,1\}$: 1 if edge $(i,j)$ is selected
+- $d_i \ge 0$: path distance from transformer to node $i$
+
+#### Objective
+Minimize total LV network length:
+
+$$ \min \sum_{i \in N} \sum_{j \in N} c_{ij} x_{ij} $$
+
+#### Constraints
+
+**(1) Each customer has exactly one incoming edge**
+
+$$ \sum_{i \in N, i \neq j} x_{ij} = 1, \quad \forall j \in N \setminus \{0} $$
+
+**(2) Transformer has no incoming edge**
+
+$$ \sum_{i \in N, i \neq 0} x_{i0} = 0 $$
+
+**(3) Root distance initialization**
+
+$$ d_0 = 0 $$
+
+**(4) Path distance propagation**
+
+$$ d_j \ge d_i + c_{ij} - M(1 - x_{ij}), \quad \forall i \neq j $$
+
+If edge $(i,j)$ is selected, this enforces that the path distance to node $j$ equals the path distance to $i$ plus the edge length.
+
+**(5) Maximum path distance constraint**
+
+$$ d_i \le D^{\max}, \quad \forall i \in N $$
+
+Ensures all nodes are within the allowed network distance from the transformer.
+
+---
+
+### Notes
+
+- This formulation builds a **rooted LV tree** minimizing total line length.
+- It enforces **path-based distance constraints**, unlike the MST-based configuration which uses a direct distance approximation.
+- This approach is more computationally expensive than the MST-based accelerated method, and is included as an alternative configuration.
