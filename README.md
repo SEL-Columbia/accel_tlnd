@@ -1,5 +1,7 @@
 # Accelerated Two-Level Network Design Model
 
+If you would like to use a GUI version, please refer to the training-version branch; otherwise, stay at this main branch.
+
 ## Repository Structure
 
 This script processes geospatial data to design and evaluate a local network with two levels: low-voltage and medium-voltage. It inputs a geospatial file and outputs the network layout along with relevant metrics.
